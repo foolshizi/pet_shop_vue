@@ -71,12 +71,19 @@ export default {
                   _this.$message.success(response.msg);
                   var user_id = response.data.user.id;
                   var name = response.data.user.name;
+                  var token = response.data.token;
                   console.log("user_id");
                   console.log(user_id);
                   localStorage.setItem("id",user_id);
                   localStorage.setItem("name",name);
+                  localStorage.setItem("token",token)
+                  var token1 = localStorage.getItem("token");
+                  // if(token1==null||token1===undefined||token1===""){
+                  //
+                  // }
                   // 跳转到首页或其他页面
-                  this.$router.push('/');
+                  // this.$router.push('/');
+                  this.$router.go(-1)
                 } else {
                   // 登录失败的操作，如提示错误信息
                   console.log(response.code)

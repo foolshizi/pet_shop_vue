@@ -124,8 +124,6 @@
     <div style="width: 1000px">
       <el-collapse style="width:100%" v-model="activeNames" @change="handleChange">
         <el-collapse-item style="width:100%;" title="商品描述1" name="1">
-          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
           <div v-html="richTextContent"></div>
         </el-collapse-item>
         <el-collapse-item title="评论" name="2">
@@ -249,7 +247,7 @@ export default {
       pageNum:1,
       pageSize:10,
       total:0,
-      user_id:'1',
+      user_id:'',
       commodity_id:'',
       specification_price_id:'',
       dialogVisible: false,
@@ -260,6 +258,7 @@ export default {
   created() {
     this.addDictData()
     this.getproductDetails()
+    this.user_id=localStorage.getItem("id")
   },
   // mounted() {
   //   console.log(this.productDetails)
@@ -298,6 +297,27 @@ export default {
     // }
   },
   methods: {
+    open() {
+      this.$confirm('该功能需要登录才能使用，是否登录', '提示', {
+        confirmButtonText: '是',
+        cancelButtonText: '否',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        this.$router.push({path:"/login"})
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消登录'
+        });
+      });
+    },
+    checkLogin(){
+      const token1 = localStorage.getItem("token");
+      if (token1 == null||token1===""||token1===undefined){
+        this.open()
+      }
+    },
     setCurrent(row) {
       this.$refs.singleTable.setCurrentRow(row);
     },
@@ -342,7 +362,7 @@ export default {
     },
     addShip(){
       //添加到购物车
-
+      this.checkLogin()
       console.log(this.user_id)
       console.log(this.commodity_id)
       console.log(this.currentSelectSpec)
@@ -365,18 +385,25 @@ export default {
           type: 'success'
         });
       }).then(res=>{
+        console.log("res")
         console.log(res);
       }).catch(error=>{
         console.error('加入购物车失败!!!!', error);
       })
     },
     gotoShip(){
+      this.checkLogin()
       console.log("买买买")
+      const token2 = localStorage.getItem("token");
+      if (token2 == null||token2===""||token2===undefined){
+        this.dialogVisible=false
+      }else{
+        this.dialogVisible=true
+      }
 
-      this.dialogVisible=true
       request.get(globalVar.HOST_NAME+"/user/addresslist",{
         params:{
-          user_id:"34"
+          user_id:this.user_id
         }
       }).then(res=>{
         console.log(res)
@@ -398,8 +425,8 @@ export default {
     },
     sureorder(){
 
-      request({url:"http://428207b5.r9.cpolar.top"+"/user_order/create_one",method:"POST",data:{
-          user_id:"34",
+      request({url:globalVar.HOST_NAME+"/user_order/create_one",method:"POST",data:{
+          user_id:this.user_id,
           order_address_id:this.currentRow.id,
           commodity_id:this.commodity_id,
           specification_price_id: this.currentSelectSpec,
