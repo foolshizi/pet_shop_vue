@@ -178,7 +178,7 @@ export default {
 
             axios.get(globalVar.HOST_NAME+"/user/addresslist", {
                 params: {
-                    user_id: sessionStorage.getItem('id'),
+                    user_id: localStorage.getItem('id'),
                 }
             })
                 .then(response => {
